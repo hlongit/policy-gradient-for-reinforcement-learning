@@ -1,0 +1,23 @@
+# Session artifacts
+/.dsh-drop
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Trained model artifacts (reproduce via scripts instead)
+*.pt
+*.pth
+checkpoints/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

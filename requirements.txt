@@ -1,0 +1,10 @@
+# Core dependencies — REINFORCE / CartPole project
+# Install with: pip install -r requirements.txt
+torch>=2.0
+gymnasium>=0.29
+matplotlib>=3.7
+numpy>=1.26
+
+# Notebook tooling (smoke test + analysis notebooks)
+jupyterlab>=4.0
+nbconvert>=7.0
