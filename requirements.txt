@@ -1,9 +1,10 @@
-# Core dependencies — REINFORCE / CartPole project
+# Core dependencies — REINFORCE / highway-env project
 # Install with: pip install -r requirements.txt
 torch>=2.0
-gymnasium>=0.29
+highway-env>=0.3.0      # pulls in gymnasium + pygame
 matplotlib>=3.7
 numpy>=1.26
+imageio>=2.31             # episode GIF recording
 
 # Notebook tooling (smoke test + analysis notebooks)
 jupyterlab>=4.0

@@ -2,7 +2,7 @@
 
 Presentation deck parts (Weeks 2–5), one file per slide part:
 
-- `part01_foundations.md` — RL foundations, CartPole formulation (M3)
+- `part01_foundations.md` — RL foundations, highway-env driving task formulation (M3)
 - `part02_derivation.md` — policy gradient derivation, lemmas (M2)
 - `part03_algorithm.md` — REINFORCE workflow, network architecture (M3)
 - `part04_experiments.md` — setup, learning curves, variance comparison (M3)

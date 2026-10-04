@@ -8,8 +8,8 @@ for the mapping between these symbols and actual code variables.
 
 | Symbol | Meaning | Code counterpart |
 |---|---|---|
-| $s \in \mathcal{S}$ | State (observation) | `state`, `obs` — shape `(4,)` for CartPole |
-| $a \in \mathcal{A}$ | Action | `action` — `{0, 1}` for CartPole |
+| $s \in \mathcal{S}$ | State (observation) | `obs` — Box `(5, 5)`, flatten to 25-dim for the network |
+| $a \in \mathcal{A}$ | Action | `action` — `{0..4}` for `highway-v0` |
 | $P(s' \mid s, a)$ | Transition probability of next state | handled by Gymnasium (environment) |
 | $R(s, a)$ | Reward function | `reward` |
 | $\gamma \in [0, 1)$ | Discount factor | `gamma` |

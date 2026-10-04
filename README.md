@@ -1,17 +1,19 @@
 # Policy Gradient for Reinforcement Learning
 
 A from-scratch implementation and mathematical derivation of the
-**REINFORCE** policy gradient algorithm, evaluated on **CartPole-v1**
-(Gymnasium). The project pairs working PyTorch code with step-by-step
-analytical proofs and a comparative variance-reduction study
-(vanilla return vs. reward-to-go vs. baseline).
+**REINFORCE** policy gradient algorithm, evaluated on
+**highway-env's `highway-v0`** (Gymnasium): a lane-keeping
+driving task with 5 discrete driving actions. The project pairs
+working PyTorch code with step-by-step analytical proofs and a
+comparative variance-reduction study (vanilla return vs.
+reward-to-go vs. baseline).
 
 ## Repository Structure
 
 ```
 .
 ├── README.md               # this file: overview + reproduction commands
-├── requirements.txt        # torch, gymnasium, matplotlib, numpy
+├── requirements.txt        # torch, highway-env, matplotlib, numpy
 ├── src/                    # core library code
 │   ├── policy.py           #   policy network (MLP + softmax head)
 │   ├── returns.py          #   return / reward-to-go / advantage computations
@@ -20,7 +22,7 @@ analytical proofs and a comparative variance-reduction study
 │   ├── train_reinforce.py  #   training entry point (vanilla / rtg / baseline)
 │   └── plot_results.py     #   plots from CSV logs
 ├── tests/                  # verification notebooks
-│   └── smoke_test_cartpole.ipynb  # env + spec sanity check (5 random episodes)
+│   └── smoke_test_highway.ipynb  # env + spec check, 5-episode baseline, one GIF per episode
 ├── docs/                   # written deliverables
 │   ├── notation.md         #   1-page notation cheat sheet
 │   ├── derivation.md       #   policy gradient derivation (M2)
@@ -41,13 +43,14 @@ Requires Python 3.10+.
 python -m venv .venv
 .venv\Scripts\activate        # Windows (source .venv/bin/activate on macOS/Linux)
 pip install -r requirements.txt
-jupyter nbconvert --to notebook --execute tests/smoke_test_cartpole.ipynb
-# ...or open it interactively: jupyter lab tests/smoke_test_cartpole.ipynb
+jupyter nbconvert --to notebook --execute tests/smoke_test_highway.ipynb
+# ...or open it interactively: jupyter lab tests/smoke_test_highway.ipynb
 ```
 
-The smoke-test notebook prints the CartPole observation/action spaces and the
-episode lengths of 5 random-policy episodes — a passing run means the
-local environment is ready.
+The smoke-test notebook prints the highway observation/action spaces,
+records the lengths and returns of 5 random-policy episodes, and saves
+one animated GIF per episode to `results/videos/` — a passing run means
+the local environment is ready.
 
 ## Reproduction Commands
 
