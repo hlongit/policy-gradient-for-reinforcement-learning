@@ -1,8 +1,10 @@
 # Notation Cheat Sheet
 
 One-page reference for all symbols used across code, notes, and slides.
-Keep this consistent everywhere — see `docs/code-to-math.md` (Week 4, M2)
-for the mapping between these symbols and actual code variables.
+Keep this consistent everywhere — see `docs/highway_spec.md` for the
+Kinematics observation matrix and action definitions, and
+`docs/code-to-math.md` (Week 4, M2) for the mapping between these
+symbols and actual code variables.
 
 ## MDP Fundamentals
 

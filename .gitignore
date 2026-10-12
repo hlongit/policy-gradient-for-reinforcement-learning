@@ -11,6 +11,13 @@ venv/
 # Jupyter
 .ipynb_checkpoints/
 
+# Experimental outputs (reproduce via scripts instead)
+results/logs/
+results/figures/
+results/videos/*.gif
+results/videos/*.mp4
+results/videos/*.md
+
 # Trained model artifacts (reproduce via scripts instead)
 *.pt
 *.pth

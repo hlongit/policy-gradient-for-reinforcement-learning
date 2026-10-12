@@ -13,16 +13,18 @@ reward-to-go vs. baseline).
 ```
 .
 ├── README.md               # this file: overview + reproduction commands
-├── requirements.txt        # torch, highway-env, matplotlib, numpy
+├── requirements.txt        # torch, highway-env, matplotlib, numpy, imageio, jupyterlab
 ├── src/                    # core library code
-│   ├── policy.py           #   policy network (MLP + softmax head)
-│   ├── returns.py          #   return / reward-to-go / advantage computations
-│   └── train.py            #   REINFORCE training loop
+│   ├── __init__.py
+│   ├── policy.py           #   policy network (25 -> 128 ReLU -> 128 ReLU -> 5 Softmax) + Categorical act
+│   ├── returns.py          #   return / reward-to-go estimators (vanilla vs RTG)
+│   └── train.py            #   REINFORCE training placeholder (see experiments/)
 ├── experiments/            # runnable experiment scripts
-│   ├── train_reinforce.py  #   training entry point (vanilla / rtg / baseline)
+│   ├── train_reinforce.py  #   REINFORCE training (vanilla / rtg) + Adam step
 │   └── plot_results.py     #   plots from CSV logs
-├── tests/                  # verification notebooks
-│   └── smoke_test_highway.ipynb  # env + spec check, 5-episode baseline, one GIF per episode
+├── tests/                  # verification notebooks & scripts
+│   ├── smoke_test_highway.ipynb  # env + spec check, 5-episode baseline, one GIF per episode
+│   └── rollout_test.py     # policy network shape validation (states, actions, log_probs, rewards)
 ├── docs/                   # written deliverables
 │   ├── notation.md         #   1-page notation cheat sheet
 │   ├── derivation.md       #   policy gradient derivation (M2)
@@ -34,6 +36,10 @@ reward-to-go vs. baseline).
 ├── slides/                 # presentation deck parts (assembled Week 5)
 └── REPORT.md               # final write-up (Week 5)
 ```
+
+## Docs
+- [Notation cheat sheet](docs/notation.md)
+- [highway-v0 spec table](docs/highway_spec.md)
 
 ## Setup
 
@@ -66,8 +72,9 @@ the local environment is ready.
 
 | Week | Goal | Status |
 |---|---|---|
-| 1 | Foundations: repo skeleton, requirements, notation sheet, env verified | ✅ scaffold in place |
-| 2 | Core derivations, policy network, first architecture draft | ⬜ |
+| 1 | Foundations: repo skeleton, requirements, notation sheet, env verified | ✅ scaffold + smoke test + GIFs |
+| 2 | Core derivations, policy network, first architecture draft | ✅ policy.py, returns.py, train_reinforce.py |
+| 3 | REINFORCE implementation & reward-to-go | ⏳ in progress (running test training run) |
 | 3 | REINFORCE implementation & reward-to-go | ⬜ |
 | 4 | Variance reduction experiments & media recording | ⬜ |
 | 5 | Integration, slide polish & mock defense | ⬜ |
