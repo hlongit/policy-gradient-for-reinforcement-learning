@@ -17,25 +17,26 @@ reward-to-go vs. baseline).
 ├── src/                    # core library code
 │   ├── __init__.py
 │   ├── policy.py           #   policy network (25 -> 128 ReLU -> 128 ReLU -> 5 Softmax) + Categorical act
-│   ├── returns.py          #   return / reward-to-go estimators (vanilla vs RTG)
-│   └── train.py            #   REINFORCE training placeholder (see experiments/)
+│   └── returns.py          #   return / reward-to-go estimators (vanilla vs RTG)
 ├── experiments/            # runnable experiment scripts
-│   ├── train_reinforce.py  #   REINFORCE training (vanilla / rtg) + Adam step
-│   └── plot_results.py     #   plots from CSV logs
+│   └── train_reinforce.py  #   REINFORCE training (vanilla / rtg) + Adam step
 ├── tests/                  # verification notebooks & scripts
-│   ├── smoke_test_highway.ipynb  # env + spec check, 5-episode baseline, one GIF per episode
-│   └── rollout_test.py     # policy network shape validation (states, actions, log_probs, rewards)
+│   ├── smoke_test_highway.ipynb      # Week 1: env + spec check, 5-episode baseline, one GIF per episode
+│   ├── reinforce_implementation.ipynb  # Week 3: tasks 27-30, return/loss/Adam — verified numerically
+│   ├── build_notebook.py             #   regenerates reinforce_implementation.ipynb from source
+│   └── rollout_test.py               # policy network shape validation
 ├── docs/                   # written deliverables
 │   ├── notation.md         #   1-page notation cheat sheet
-│   ├── derivation.md       #   policy gradient derivation (M2)
-│   └── proofs.md           #   causality & baseline lemmas (M2)
-├── results/                # experiment outputs
-│   ├── logs/               #   CSV training logs (returns, grad norms, seeds)
-│   ├── figures/            #   learning curves, variance comparison
-│   └── videos/             #   untrained vs. trained agent clips
-├── slides/                 # presentation deck parts (assembled Week 5)
-└── REPORT.md               # final write-up (Week 5)
+│   └── highway_spec.md     #   Kinematics obs matrix + action definitions
+└── results/                # experiment outputs
+    ├── logs/               #   CSV training logs (returns, per seed)
+    └── videos/             #   untrained agent baseline clips
 ```
+
+> **Slide material lives outside this repo.**
+> The deck, its builder, rendered previews and LaTeX equation cache are in
+> `../Slide/`. Nothing here depends on them, so the repo builds and runs on a
+> clean checkout.
 
 ## Docs
 - [Notation cheat sheet](docs/notation.md)
@@ -58,14 +59,41 @@ records the lengths and returns of 5 random-policy episodes, and saves
 one animated GIF per episode to `results/videos/` — a passing run means
 the local environment is ready.
 
+### Windows: one environment variable
+
+`torch` and `highway-env` each ship their own Intel OpenMP runtime. Importing
+both into one process aborts with `OMP: Error #15` and the kernel dies with no
+Python traceback. Set this before launching Jupyter:
+
+```powershell
+$env:KMP_DUPLICATE_LIB_OK = "TRUE"
+```
+
+`tests/reinforce_implementation.ipynb` sets it inside its first cell, so a
+top-to-bottom run works without shell configuration; the smoke test still
+needs it in the environment.
+
 ## Reproduction Commands
 
-*To be filled in during Week 5 — one command per figure/table:*
+```bash
+# 1. Environment smoke test (Week 1): spec check + 5 baseline episodes + GIFs
+jupyter nbconvert --to notebook --execute tests/smoke_test_highway.ipynb
+
+# 2. Implementation walkthrough (Week 3, tasks 27-30)
+#    Verifies returns, the REINFORCE loss gradient and one Adam step.
+jupyter nbconvert --to notebook --execute tests/reinforce_implementation.ipynb
+
+# 3. Policy-network shape check
+python tests/rollout_test.py
+
+# 4. Train one variant (writes results/logs/reinforce_<seed>_<mode>.csv)
+python experiments/train_reinforce.py --mode rtg --seed 0 --epochs 30
+```
+
+Regenerate the Week 3 notebook after editing `tests/build_notebook.py`:
 
 ```bash
-# 1. Train (single seed, vanilla REINFORCE)
-# 2. Train all variants x 3 seeds
-# 3. Regenerate figures from CSV logs
+python tests/build_notebook.py
 ```
 
 ## Weekly Progress
@@ -73,10 +101,9 @@ the local environment is ready.
 | Week | Goal | Status |
 |---|---|---|
 | 1 | Foundations: repo skeleton, requirements, notation sheet, env verified | ✅ scaffold + smoke test + GIFs |
-| 2 | Core derivations, policy network, first architecture draft | ✅ policy.py, returns.py, train_reinforce.py |
-| 3 | REINFORCE implementation & reward-to-go | ⏳ in progress (running test training run) |
-| 3 | REINFORCE implementation & reward-to-go | ⬜ |
-| 4 | Variance reduction experiments & media recording | ⬜ |
+| 2 | Core derivations, policy network, first architecture draft | ✅ policy.py, returns.py |
+| 3 | REINFORCE implementation & reward-to-go | ✅ returns + loss + Adam, verified in `reinforce_implementation.ipynb` |
+| 4 | Variance reduction experiments & media recording | ⬜ 3-seed batch not run yet |
 | 5 | Integration, slide polish & mock defense | ⬜ |
 
 ## Team

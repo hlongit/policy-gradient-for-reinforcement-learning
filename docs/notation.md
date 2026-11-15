@@ -22,10 +22,15 @@ symbols and actual code variables.
 
 | Symbol | Meaning | Code counterpart |
 |---|---|---|
-| $\tau = (s_0, a_0, r_1, s_1, a_1, \dots)$ | Trajectory (episode) | one episode's recorded lists |
-| $T$ | Episode length (terminal time step) | `len(episode)` |
-| $G_t = \sum_{k=t}^{T} \gamma^{k-t} r_k$ | Discounted return from time $t$ | `returns[t]` |
-| $R(\tau) = \sum_{t=0}^{T} \gamma^{t} r_t$ | Total discounted return of a trajectory | `episode_return` |
+| $\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \dots, s_T)$ | Trajectory (episode) | one episode's recorded lists |
+| $T$ | Episode length (number of steps) | `len(episode)` |
+| $G_t = \sum_{k=t}^{T-1} \gamma^{k-t} r_k$ | Discounted return from time $t$ | `returns[t]` |
+| $R(\tau) = \sum_{t=0}^{T-1} \gamma^{t} r_t = G_0$ | Total discounted return of a trajectory | `episode_return` |
+
+> **Index convention (fixed deck-wide).** Reward $r_t$ is the reward received
+> after taking action $a_t$ in state $s_t$. An episode of $T$ steps therefore
+> has rewards $r_0, \dots, r_{T-1}$ and states $s_0, \dots, s_T$. Every sum in
+> the deck runs over $t = 0, \dots, T-1$.
 
 ## Policy and Objective
 
@@ -41,7 +46,7 @@ symbols and actual code variables.
 
 ```latex
 \mathcal{S}, \mathcal{A}, P(s' \mid s, a), R(s, a), \gamma
-\tau = (s_0, a_0, s_1, \dots), \quad G_t = \sum_{k=t}^T \gamma^{k-t} r_k
-J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}[R(\tau)]
-\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ R(\tau) \sum_t \nabla_\theta \log \pi_\theta(a_t \mid s_t) \right]
+\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \dots, s_T), \quad G_t = \sum_{k=t}^{T-1} \gamma^{k-t} r_k
+J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}[R(\tau)], \quad R(\tau) = \sum_{t=0}^{T-1} \gamma^{t} r_t = G_0
+\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^{T-1} \gamma^{t} G_t \nabla_\theta \log \pi_\theta(a_t \mid s_t) \right]
 ```

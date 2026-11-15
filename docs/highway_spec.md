@@ -37,9 +37,29 @@ obs = [[present, x, y, vx, vy],   # ego (row 0)
 
 | Property | Value |
 |---|---|
-| Reward signal | Speed-based: +1 per step at target speed (20 m/s); collision penalty |
+| Reward signal | **normalised mixture**, $r \in [0,1]$ (see below) |
+| `high_speed_reward` | $0.4$ |
+| `right_lane_reward` | $0.1$ |
+| `collision_reward` | $-1$ |
+| `lane_change_reward` | $0$ |
+| `reward_speed_range` | $[20, 30]$ m/s |
+| `normalize_reward` | `True` |
 | Episode max length | 40 steps (default `duration`) |
 | Termination | collision, off-road, or timeout |
+
+The reward is **not** a flat $+1$ at a target speed. `HighwayEnv._reward`
+computes a weighted sum of the named reward terms, linearly maps it from
+`[collision_reward, high_speed_reward + right_lane_reward]` $= [-1, 0.5]$ onto
+$[0, 1]$, then multiplies by the on-road indicator:
+
+```python
+reward = utils.lmap(reward, [collision_reward,
+                             high_speed_reward + right_lane_reward], [0, 1])
+reward *= rewards["on_road_reward"]
+```
+
+Consequence for the slides: since $r_t \le 1$ and $\gamma = 0.99$,
+$G_0 \le \sum_{k<40} 0.99^{k} = 33.10$, so gradient weights are bounded.
 
 ## Config to Reproduce
 

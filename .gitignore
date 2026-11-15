@@ -11,12 +11,16 @@ venv/
 # Jupyter
 .ipynb_checkpoints/
 
-# Experimental outputs (reproduce via scripts instead)
-results/logs/
+# Presentation material lives OUTSIDE this repo (../Slide).
+# These rules stop a slide build from drifting back in: the deck builder,
+# its LaTeX equation cache and the rendered previews are all large and are
+# regenerable, and nothing in src/ or tests/ depends on them.
+slides/
+preview/
+_sampleprev/
+_tmpl_preview/
 results/figures/
-results/videos/*.gif
-results/videos/*.mp4
-results/videos/*.md
+*.pptx
 
 # Trained model artifacts (reproduce via scripts instead)
 *.pt
