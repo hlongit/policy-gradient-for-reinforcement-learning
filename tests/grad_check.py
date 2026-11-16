@@ -41,7 +41,7 @@ def analytic(theta):
         s = t % 2
         # d/dtheta[s,a] of probs[s,s] = probs[s,s]*(1[a==s] - probs[s,a])
         g[s, :] += (GAMMA ** t) * probs[s, s] * (
-            torch.eye(2)[s] - probs[s, :])
+            torch.eye(2, dtype=theta.dtype)[s] - probs[s, :])
     return g
 
 
@@ -56,12 +56,21 @@ def numeric(theta, eps=1e-5):
     return g
 
 
-for label, th in [("theta = 0", torch.zeros(2, 2)),
-                  ("asymmetric", torch.tensor([[0.3, -0.2], [-0.5, 0.8]]))]:
+# float64 is not decoration: in float32 the finite-difference truncation and
+# rounding errors leave ~1e-2 of disagreement, which cannot distinguish "the
+# analytic gradient is right" from "both are roughly right". In float64 the
+# two agree to ~1e-10, and any real algebra error shows up as a gap that
+# dwarfs that.
+DTYPE = torch.float64
+
+for label, th in [("theta = 0", torch.zeros(2, 2, dtype=DTYPE)),
+                  ("asymmetric",
+                   torch.tensor([[0.3, -0.2], [-0.5, 0.8]], dtype=DTYPE))]:
     a, n = analytic(th), numeric(th)
+    gap = (a - n).abs().max().item()
     print(label)
-    print("  analytic:", [round(v, 6) for v in a.flatten().tolist()])
-    print("  numeric :", [round(v, 6) for v in n.flatten().tolist()])
-    print("  max |diff| = %.3e" % (a - n).abs().max().item())
-    print("  J = %.6f" % J(th).item())
+    print("  analytic:", [round(v, 10) for v in a.flatten().tolist()])
+    print("  numeric :", [round(v, 10) for v in n.flatten().tolist()])
+    print("  max |diff| = %.3e  %s" % (gap, "OK" if gap < 1e-8 else "MISMATCH"))
+    print("  J = %.10f" % J(th).item())
     print()
