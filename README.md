@@ -88,13 +88,62 @@ python tests/rollout_test.py
 
 # 4. Train one variant (writes results/logs/reinforce_<seed>_<mode>.csv)
 python experiments/train_reinforce.py --mode rtg --seed 0 --epochs 30
+
+# 5. Full batch: 3 seeds x {vanilla, rtg, baseline} (Week 4, tasks 39-41)
+#    300 episodes, not 30: REINFORCE needs ~150+ updates before the return
+#    moves at all (measured: 8.19 -> 27.12 over 300). At 30 episodes every
+#    variant just flatlines and the comparison is meaningless.
+python experiments/run_batch.py --seeds 0 1 2 --epochs 300
+
+# 6. Plots from the logs (Week 4, tasks 44-46)
+python experiments/plot_results.py
+
+# 7. Estimator-variance measurement (task 46) — projected gradient variance,
+#    not return spread. Fits the baseline on the first half and measures on
+#    the second, so the critic never sees the trajectories it de-noises.
+python experiments/measure_variance.py --n 400 --epochs 40
+
+# 8. Baseline-quality ablation: rtg vs rtg+constant vs rtg+linear critic
+python experiments/baseline_quality.py
+
+# 9. Record the trained-agent clips (task 43)
+python experiments/record_demo.py --epochs 300 --episodes 2
 ```
 
-Regenerate the Week 3 notebook after editing `tests/build_notebook.py`:
+## Environment configuration (read before comparing numbers)
 
-```bash
-python tests/build_notebook.py
+`highway-v0` ships with `vehicles_count: 50`. On this machine that costs
+~680 ms per `env.step()`, so a single 15-step episode takes ~10 s and a
+training run long enough to actually learn takes hours. All scripts here set
+
+```python
+ENV_CONFIG = {"vehicles_count": 20}      # ~155 ms/step, 4.4x faster
 ```
+
+This is a **different, easier task** than the upstream default (less traffic).
+Numbers produced with 20 vehicles are therefore not comparable to any run made
+with 50. Every results table must state which config produced it.
+
+## Two bugs worth knowing about (both fixed)
+
+1. `measure_variance.py` appended `log_prob` **without** `.squeeze(-1)`, so the
+   stacked tensor was `(T, 1)`. Multiplying by a `(T,)` weight vector then
+   broadcast to `(T, T)`, making the loss a product of two sums. Every variant's
+   gradient became collinear (cosine = 1.000000) and `trace(Cov)` came out
+   proportional to `‖E[g]‖²` — which *looked* like a 0.28x variance reduction
+   that was purely a change of gradient scale. `tests/estimator_sanity.py`
+   catches this class of bug on a 4-step problem with a known answer.
+
+2. `trace(Cov)` in ~20k dimensions cannot be estimated from a few hundred
+   trajectories (rank ≤ n-1). The scripts now report `E[Var(u·ĝ)]` over random
+   unit directions instead, which estimates the mean per-coordinate variance.
+
+Run the batch before the plots: `plot_results.py` reads whatever CSVs exist in
+`results/logs/` and will silently plot a single seed if the batch was not run.
+
+`measure_variance.py` is separate from `plot_results.py` on purpose — see the
+note under "Variance: two different measurements".
+
 
 ## Weekly Progress
 
@@ -103,7 +152,7 @@ python tests/build_notebook.py
 | 1 | Foundations: repo skeleton, requirements, notation sheet, env verified | ✅ scaffold + smoke test + GIFs |
 | 2 | Core derivations, policy network, first architecture draft | ✅ policy.py, returns.py |
 | 3 | REINFORCE implementation & reward-to-go | ✅ returns + loss + Adam, verified in `reinforce_implementation.ipynb` |
-| 4 | Variance reduction experiments & media recording | ⬜ 3-seed batch not run yet |
+| 4 | Variance reduction experiments & media recording | 🟡 training learns (8.19 → 27.12 over 300 ep); variance measured with the corrected estimator |
 | 5 | Integration, slide polish & mock defense | ⬜ |
 
 ## Team
